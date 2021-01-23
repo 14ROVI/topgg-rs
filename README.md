@@ -1,4 +1,4 @@
-# c-rs
+# topgg-rs
 A top.gg library.
 
 
