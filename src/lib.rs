@@ -201,29 +201,29 @@ struct JsonBot {
 }
 
 #[derive(Deserialize, Debug)]
-struct Bot {
-    id: u64,
-    username: String,
-    discriminator: String,
-    avatar: Option<String>,
-    def_avatar: String,
-    lib: String,
-    prefix: String,
-    short_desc: String,
-    long_desc: Option<String>,
-    tags: Vec<String>,
-    website: Option<String>,
-    support: Option<String>,
-    github: Option<String>,
-    owners: Vec<u64>,
-    guilds: Vec<u64>,
-    invite: Option<String>,
-    date: String,
-    certified_bot: bool,
-    vanity: Option<String>,
-    points: u64,
-    monthly_points: u64,
-    donate_bot_guild_id: Option<u64>
+pub struct Bot {
+    pub id: u64,
+    pub username: String,
+    pub discriminator: String,
+    pub avatar: Option<String>,
+    pub def_avatar: String,
+    pub lib: String,
+    pub prefix: String,
+    pub short_desc: String,
+    pub long_desc: Option<String>,
+    pub tags: Vec<String>,
+    pub website: Option<String>,
+    pub support: Option<String>,
+    pub github: Option<String>,
+    pub owners: Vec<u64>,
+    pub guilds: Vec<u64>,
+    pub invite: Option<String>,
+    pub date: String,
+    pub certified_bot: bool,
+    pub vanity: Option<String>,
+    pub points: u64,
+    pub monthly_points: u64,
+    pub donate_bot_guild_id: Option<u64>
 }
 
 #[derive(Deserialize, Debug)]
@@ -245,25 +245,25 @@ struct JsonUser {
 }
 
 #[derive(Debug)]
-struct User {
-    id: u64,
-    username: String,
-    discriminator: String,
-    avatar: Option<String>,
-    def_avatar: String,
-    bio: Option<String>,
-    banner: Option<String>,
-    youtube: Option<String>,
-    reddit: Option<String>,
-    twitter: Option<String>,
-    instagram: Option<String>,
-    github: Option<String>, 
-    color: Option<String>,
-    supporter: bool,
-    certified_dev: bool,
-    moderator: bool,
-    web_moderator: bool,
-    admin: bool,
+pub struct User {
+    pub id: u64,
+    pub username: String,
+    pub discriminator: String,
+    pub avatar: Option<String>,
+    pub def_avatar: String,
+    pub bio: Option<String>,
+    pub banner: Option<String>,
+    pub youtube: Option<String>,
+    pub reddit: Option<String>,
+    pub twitter: Option<String>,
+    pub instagram: Option<String>,
+    pub github: Option<String>, 
+    pub color: Option<String>,
+    pub supporter: bool,
+    pub certified_dev: bool,
+    pub moderator: bool,
+    pub web_moderator: bool,
+    pub admin: bool,
 }
 
 #[derive(Deserialize, Debug)]
@@ -275,11 +275,11 @@ struct PartialJsonUser {
 }
 
 #[derive(Debug)]
-struct PartialUser {
-    id: u64,
-    username: String,
-    discriminator: String,
-    avatar: Option<String>
+pub struct PartialUser {
+    pub id: u64,
+    pub username: String,
+    pub discriminator: String,
+    pub avatar: Option<String>
 }
 
 #[derive(Deserialize, Debug)]
@@ -288,10 +288,10 @@ struct CheckVote {
 }
 
 #[derive(Deserialize, Debug)]
-struct BotStats {
-    server_count: Option<u32>,
-    shards: Vec<u32>,
-    shard_count: Option<u32>
+pub struct BotStats {
+    pub server_count: Option<u32>,
+    pub shards: Vec<u32>,
+    pub shard_count: Option<u32>
 }
 
 #[derive(Serialize, Debug)]
