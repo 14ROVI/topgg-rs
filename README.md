@@ -5,7 +5,7 @@ A top.gg library.
 
 ## How to use
 In your `Cargo.toml`
-```rust
+```toml
 [dependencies]
 topgg-rs = "0.1.0"
 ```
