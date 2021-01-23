@@ -3,6 +3,11 @@ name = "topgg"
 version = "0.1.0"
 authors = ["14ROVI <29734170+14ROVI@users.noreply.github.com>"]
 edition = "2018"
+repository = "https://github.com/14ROVI/topgg-rs"
+readme = "README.md"
+description = "A top.gg library that makes posting and getting info easy!"
+keywords = ["discord", "bots", "topgg", "top.gg", "dbl", "discordbotslist"]
+
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
