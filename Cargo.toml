@@ -6,7 +6,7 @@ edition = "2018"
 repository = "https://github.com/14ROVI/topgg-rs"
 readme = "README.md"
 description = "A top.gg library that makes posting and getting info easy!"
-keywords = ["discord", "bots", "topgg", "top.gg", "dbl", "discordbotslist"]
+keywords = ["discord", "bots", "topgg", "dbl", "discordbotslist"]
 categories = ["api-bindings", "web-programming::http-client"]
 license = "MIT"
 
