@@ -2,7 +2,14 @@
 A top.gg library.
 
 
+
 ## How to use
+In your `Cargo.toml`
+```rust
+[dependencies]
+topgg-rs = "0.1.0"
+```
+
 ```rust
 #[tokio::main]
 async fn main() {
