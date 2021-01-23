@@ -919,7 +919,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "topgg-rs"
+name = "topgg"
 version = "0.1.0"
 dependencies = [
  "reqwest",

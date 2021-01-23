@@ -20,7 +20,7 @@ impl Topgg {
     }
 
 
-    async fn bot(&self, bot_id: Option<u64>) -> Bot {
+    pub async fn bot(&self, bot_id: Option<u64>) -> Bot {
         let bot_id = bot_id.unwrap_or(self.bot_id);
         let url = format!("{}/bots/{}", BASE_URL, bot_id);
         let res = self.client
@@ -60,7 +60,7 @@ impl Topgg {
     }
 
 
-    async fn user(&self, user_id: u64) -> User {
+    pub async fn user(&self, user_id: u64) -> User {
         let url = format!("{}/users/{}", BASE_URL, user_id);
         let res = self.client
             .get(&url)
@@ -95,7 +95,7 @@ impl Topgg {
     }
 
 
-    async fn votes(&self) -> Vec<u64> {
+    pub async fn votes(&self) -> Vec<u64> {
         let url = format!("{}/bots/{}/votes", BASE_URL, self.bot_id);
         let res = self.client
             .get(&url)
@@ -111,7 +111,7 @@ impl Topgg {
     }
 
 
-    async fn check_vote(&self, user_id: u64) -> bool {
+    pub async fn voted(&self, user_id: u64) -> bool {
         let url = format!("{}/bots/{}/check?userId={}", BASE_URL, self.bot_id, user_id);
         let res = self.client
             .get(&url)
@@ -131,7 +131,7 @@ impl Topgg {
     }
 
 
-    async fn get_bot_stats(&self, bot_id: Option<u64>) -> BotStats {
+    pub async fn get_bot_stats(&self, bot_id: Option<u64>) -> BotStats {
         let bot_id = bot_id.unwrap_or(self.bot_id);
         let url = format!("{}/bots/{}/stats", BASE_URL, bot_id);
         let res = self.client
@@ -148,7 +148,7 @@ impl Topgg {
     }
 
     
-    async fn post_bot_stats(&self, server_count: Option<u32>, shards: Option<Vec<u32>>, shard_id: Option<u32>, shard_count: Option<u32>) {
+    pub async fn post_bot_stats(&self, server_count: Option<u32>, shards: Option<Vec<u32>>, shard_id: Option<u32>, shard_count: Option<u32>) {
         if server_count.is_none() && shards.is_none() {
             return;
         }

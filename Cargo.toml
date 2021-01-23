@@ -1,5 +1,5 @@
 [package]
-name = "topgg-rs"
+name = "topgg"
 version = "0.1.0"
 authors = ["14ROVI <29734170+14ROVI@users.noreply.github.com>"]
 edition = "2018"
