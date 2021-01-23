@@ -173,14 +173,14 @@ impl Topgg {
 
 
 
-
+#[allow(non_snake_case)]
 #[derive(Deserialize, Debug)]
 struct JsonBot {
     id: String,
     username: String,
     discriminator: String,
     avatar: Option<String>,
-    defAvatar: String,
+    defAvatar: String, 
     lib: String,
     prefix: String,
     shortdesc: String,
@@ -226,6 +226,7 @@ pub struct Bot {
     pub donate_bot_guild_id: Option<u64>
 }
 
+#[allow(non_snake_case)]
 #[derive(Deserialize, Debug)]
 struct JsonUser {
     id: String,
@@ -265,6 +266,7 @@ pub struct User {
     pub web_moderator: bool,
     pub admin: bool,
 }
+
 
 #[derive(Deserialize, Debug)]
 struct PartialJsonUser {
