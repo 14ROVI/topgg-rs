@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
+use std::num::NonZeroU32;
+use governor::{Quota, RateLimiter, clock, state};
 
 
 const BASE_URL: &str = "https://top.gg/api";
@@ -9,7 +11,8 @@ const BASE_URL: &str = "https://top.gg/api";
 pub struct Topgg {
     bot_id: u64,
     token: String,
-    client: reqwest::Client
+    client: reqwest::Client,
+    limiter: RateLimiter<state::direct::NotKeyed, state::InMemoryState, clock::DefaultClock>
 }
 impl Topgg {
     /// Returns a new client.
@@ -29,7 +32,10 @@ impl Topgg {
         Topgg {
             bot_id: bot_id,
             token: token,
-            client: reqwest::Client::new()
+            client: reqwest::Client::new(),
+            limiter: RateLimiter::direct(
+                Quota::per_minute(NonZeroU32::new(60u32).unwrap())
+            )
         }
     }
 
@@ -50,6 +56,8 @@ impl Topgg {
     /// let bot_info = lient.bot(668701133069352961).await.unwrap();
     /// ```
     pub async fn bot(&self, bot_id: u64) -> Option<Bot> {
+        self.limiter.until_ready().await;
+        println!("requesting");
         let url = format!("{}/bots/{}", BASE_URL, bot_id);
         let res = self.client
             .get(&url)
@@ -102,6 +110,7 @@ impl Topgg {
     /// client.user(195512978634833920).await.unwrap();
     /// ```
     pub async fn user(&self, user_id: u64) -> Option<User> {
+        self.limiter.until_ready().await;
         let url = format!("{}/users/{}", BASE_URL, user_id);
         let res = self.client
             .get(&url)
@@ -160,6 +169,7 @@ impl Topgg {
     /// client.votes(668701133069352961).await.unwrap();
     /// ```
     pub async fn votes(&self, bot_id: u64) -> Option<Vec<u64>> {
+        self.limiter.until_ready().await;
         let url = format!("{}/bots/{}/votes", BASE_URL, bot_id);
         let res = self.client
             .get(&url)
@@ -205,6 +215,7 @@ impl Topgg {
     ///     .unwrap();
     /// ```
     pub async fn voted(&self, bot_id: u64, user_id: u64) -> Option<bool> {
+        self.limiter.until_ready().await;
         let url = format!("{}/bots/{}/check?userId={}", BASE_URL, bot_id, user_id);
         let res = self.client
             .get(&url)
@@ -248,6 +259,7 @@ impl Topgg {
     /// client.get_bot_stats(Some(668701133069352961)).await.unwrap();
     /// ```
     pub async fn get_bot_stats(&self, bot_id: u64) -> Option<BotStats> {
+        self.limiter.until_ready().await;
         let url = format!("{}/bots/{}/stats", BASE_URL, bot_id);
         let res = self.client
             .get(&url)
@@ -278,25 +290,26 @@ impl Topgg {
     /// client.post_bot_stats(Some(142), None, Some(0), None).await;
     /// client.post_bot_stats(Some(978), None, None, Some(3)).await;
     /// ```
-    pub async fn post_bot_stats(&self, server_count: Option<u32>, shards: Option<Vec<u32>>, shard_id: Option<u32>, shard_count: Option<u32>) {
-        if server_count.is_none() && shards.is_none() {
-            return;
-        }
-
+    pub async fn post_bot_stats(
+        &self,
+        server_count: Option<u32>,
+        shards: Option<Vec<u32>>,
+        shard_id: Option<u32>,
+        shard_count: Option<u32>
+    ) -> Result<reqwest::Response, reqwest::Error> {
+        self.limiter.until_ready().await;
         let url = format!("{}/bots/{}/stats", BASE_URL, self.bot_id);
-        #[allow(unused_must_use)] {
-            self.client
-                .post(&url)
-                .header("Authorization", &self.token)
-                .json(&PostBotStats {
-                    server_count: server_count,
-                    shards: shards,
-                    shard_id: shard_id,
-                    shard_count: shard_count,
-                })
-                .send()
-                .await;
-        }
+        self.client
+            .post(&url)
+            .header("Authorization", &self.token)
+            .json(&PostBotStats {
+                server_count: server_count,
+                shards: shards,
+                shard_id: shard_id,
+                shard_count: shard_count,
+            })
+            .send()
+            .await
     }
 }
 

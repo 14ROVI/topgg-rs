@@ -1,6 +1,5 @@
 # topgg-rs
-A top.gg library.
-
+A top.gg library for rust that also abides by their rate limit.
 
 
 ## How to use
