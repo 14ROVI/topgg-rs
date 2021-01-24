@@ -35,33 +35,37 @@ impl Topgg {
 
 
     /// A shortcut for getting the botinfo for your own bot.
-    pub async fn my_bot(&self) -> Bot {
-        self.bot(None).await
+    pub async fn my_bot(&self) -> Option<Bot> {
+        self.bot(self.bot_id).await
     }
 
 
-    /// Gets the info for a bot given an ID. If no ID is specified then it will use the one you used when setting up the client.
+    /// Gets the info for a bot given an ID. To get the info for your own bot `client.my_bot()` can be used as a shortcut.
     /// ## Examples
     /// ```
-    /// // Gets the info for the client's bot_id
-    /// client.bot(None).await;
-    /// // Gets info for a different bot
-    /// client.bot(Some(668701133069352961)).await;
+    /// client.bot(668701133069352961).await;
     /// ```
-    pub async fn bot(&self, bot_id: Option<u64>) -> Bot {
-        let bot_id = bot_id.unwrap_or(self.bot_id);
+    pub async fn bot(&self, bot_id: u64) -> Option<Bot> {
         let url = format!("{}/bots/{}", BASE_URL, bot_id);
         let res = self.client
             .get(&url)
             .header("Authorization", &self.token)
             .send()
-            .await
-            .unwrap()
-            .json::<JsonBot>()
-            .await
-            .unwrap();
+            .await;
+        if res.is_err() {
+            return None;
+        }
 
-        Bot {
+        let res = res
+            .unwrap()        
+            .json::<JsonBot>()
+            .await;
+        if res.is_err() {
+            return None;
+        }
+        let res = res.unwrap();
+
+        Some( Bot {
             id: res.id.parse::<u64>().unwrap(),
             username: res.username,
             discriminator: res.discriminator,
@@ -84,7 +88,7 @@ impl Topgg {
             points: res.points,
             monthly_points: res.monthlyPoints,
             donate_bot_guild_id: res.donatebotguildid.parse::<u64>().ok()
-        }
+        })
     }
 
 
