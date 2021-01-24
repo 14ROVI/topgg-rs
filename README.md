@@ -7,7 +7,7 @@ A top.gg library.
 In your `Cargo.toml`
 ```
 [dependencies]
-topgg-rs = "0.1.0"
+topgg-rs = "0.2.0"
 ```
 
 ```rust

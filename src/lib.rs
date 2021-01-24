@@ -355,6 +355,7 @@ pub struct Bot {
     pub donate_bot_guild_id: Option<u64>
 }
 
+
 #[allow(non_snake_case)]
 #[derive(Deserialize, Debug)]
 struct JsonUser {
@@ -413,10 +414,12 @@ pub struct PartialUser {
     pub avatar: Option<String>
 }
 
+
 #[derive(Deserialize, Debug)]
 struct CheckVote {
     voted: i8
 }
+
 
 #[derive(Deserialize, Debug)]
 pub struct BotStats {
@@ -424,6 +427,7 @@ pub struct BotStats {
     pub shards: Vec<u32>,
     pub shard_count: Option<u32>
 }
+
 
 #[derive(Serialize, Debug)]
 struct PostBotStats {
