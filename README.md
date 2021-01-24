@@ -35,7 +35,7 @@ async fn main() {
     
     // gets stats about the server count, servers per shard, and shard count
     c.get_bot_stats(another_bot_id).await.unwrap();
-    c.my_bot_stats().await; // or your bot
+    c.my_bot_stats().await.unwrap(); // or your bot
     
     // simply posts the server count to top.gg 
     c.post_bot_stats(Some(server_count), None, None, None).await;
