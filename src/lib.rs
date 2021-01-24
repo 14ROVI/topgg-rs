@@ -172,7 +172,7 @@ impl Topgg {
 
         let res = res
             .unwrap()        
-            .json::<Vec<PartialJsonUser>()
+            .json::<Vec<PartialJsonUser>>()
             .await;
         if res.is_err() {
             return None;
@@ -284,17 +284,19 @@ impl Topgg {
         }
 
         let url = format!("{}/bots/{}/stats", BASE_URL, self.bot_id);
-        self.client
-            .post(&url)
-            .header("Authorization", &self.token)
-            .json(&PostBotStats {
-                server_count: server_count,
-                shards: shards,
-                shard_id: shard_id,
-                shard_count: shard_count,
-            })
-            .send()
-            .await;
+        #[allow(unused_must_use)] {
+            self.client
+                .post(&url)
+                .header("Authorization", &self.token)
+                .json(&PostBotStats {
+                    server_count: server_count,
+                    shards: shards,
+                    shard_id: shard_id,
+                    shard_count: shard_count,
+                })
+                .send()
+                .await;
+        }
     }
 }
 
