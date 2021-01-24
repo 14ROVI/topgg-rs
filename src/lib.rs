@@ -22,7 +22,7 @@ impl Topgg {
     /// ```
     /// let client = topgg::Topgg::new(bot_id, token);
     /// // Do stuff with the client
-    /// let votes = client.votes().await;
+    /// let votes = client.votes().await.unwrap();
     /// ```
     /// 
     pub fn new(bot_id: u64, token: String) -> Topgg {
@@ -35,6 +35,10 @@ impl Topgg {
 
 
     /// A shortcut for getting the botinfo for your own bot.
+    /// ## Examples
+    /// ```
+    /// let bot_info = client.my_bot().await.unwrap();
+    /// ```
     pub async fn my_bot(&self) -> Option<Bot> {
         self.bot(self.bot_id).await
     }
@@ -43,7 +47,7 @@ impl Topgg {
     /// Gets the info for a bot given an ID. To get the info for your own bot `client.my_bot()` can be used as a shortcut.
     /// ## Examples
     /// ```
-    /// client.bot(668701133069352961).await;
+    /// let bot_info = lient.bot(668701133069352961).await.unwrap();
     /// ```
     pub async fn bot(&self, bot_id: u64) -> Option<Bot> {
         let url = format!("{}/bots/{}", BASE_URL, bot_id);
@@ -95,21 +99,29 @@ impl Topgg {
     /// Gets the info for a user.
     /// ## Examples
     /// ```
-    /// client.user(195512978634833920).await;
+    /// client.user(195512978634833920).await.unwrap();
     /// ```
-    pub async fn user(&self, user_id: u64) -> User {
+    pub async fn user(&self, user_id: u64) -> Option<User> {
         let url = format!("{}/users/{}", BASE_URL, user_id);
         let res = self.client
             .get(&url)
             .header("Authorization", &self.token)
             .send()
-            .await
-            .unwrap()
-            .json::<JsonUser>()
-            .await
-            .unwrap();
+            .await;
+        if res.is_err() {
+            return None;
+        }
 
-        User {
+        let res = res
+            .unwrap()        
+            .json::<JsonUser>()
+            .await;
+        if res.is_err() {
+            return None;
+        }
+        let res = res.unwrap();
+
+        Some( User {
             id: res.id.parse::<u64>().unwrap(),
             username: res.username,
             discriminator: res.discriminator,
@@ -128,78 +140,134 @@ impl Topgg {
             moderator: res.r#mod,
             web_moderator: res.webMod,
             admin: res.admin,
+        })
+    }
+
+
+    /// A shortcut for getting the votes for the bot that created the client.
+    /// ## Examples
+    /// ```
+    /// let votes = client.my_votes().await.unwrap();
+    /// ```
+    pub async fn my_votes(&self) -> Option<Vec<u64>> {
+        self.votes(self.bot_id).await
+    }
+
+
+    /// Gets the user IDs of all the users that have voted on the bot_id.
+    /// ## Examples
+    /// ```
+    /// client.votes(668701133069352961).await.unwrap();
+    /// ```
+    pub async fn votes(&self, bot_id: u64) -> Option<Vec<u64>> {
+        let url = format!("{}/bots/{}/votes", BASE_URL, bot_id);
+        let res = self.client
+            .get(&url)
+            .header("Authorization", &self.token)
+            .send()
+            .await;
+        if res.is_err() {
+            return None;
         }
+
+        let res = res
+            .unwrap()        
+            .json::<Vec<PartialJsonUser>()
+            .await;
+        if res.is_err() {
+            return None;
+        }
+        let res = res.unwrap();
+
+        Some(
+            res.into_iter()
+                .map(|u| u.id.parse::<u64>().unwrap())
+                .collect()
+        )
     }
 
 
-    /// Gets the user IDs of all the users that have voted on the bot_id used when creating the client.
+    /// A shortcut for checking if a user has voted for your own bot.
     /// ## Examples
     /// ```
-    /// client.votes().await;
+    /// let voted = client.voted_for_me(195512978634833920).await.unwrap();
     /// ```
-    pub async fn votes(&self) -> Vec<u64> {
-        let url = format!("{}/bots/{}/votes", BASE_URL, self.bot_id);
+    pub async fn voted_for_me(&self, user_id: u64) -> Option<bool> {
+        self.voted(self.bot_id, user_id).await
+    }
+
+
+    /// Checks if a user has voted for the bot or not. Returns true if they have, false if they have not.
+    /// ## Examples
+    /// ```
+    /// let voted = client.voted(668701133069352961, 195512978634833920)
+    ///     .await
+    ///     .unwrap();
+    /// ```
+    pub async fn voted(&self, bot_id: u64, user_id: u64) -> Option<bool> {
+        let url = format!("{}/bots/{}/check?userId={}", BASE_URL, bot_id, user_id);
         let res = self.client
             .get(&url)
             .header("Authorization", &self.token)
             .send()
-            .await
-            .unwrap()
-            .json::<Vec<PartialJsonUser>>()
-            .await
-            .unwrap();
+            .await;
+        if res.is_err() {
+            return None;
+        }
 
-        res.into_iter().map(|u| u.id.parse::<u64>().unwrap()).collect()
-    }
-
-
-    /// Checks if a user has voted for the bot or not. Returns true if they have, false if they have not.alloc
-    /// ## Examples
-    /// ```
-    /// let voted = client.voted(195512978634833920).await;
-    /// ```
-    pub async fn voted(&self, user_id: u64) -> bool {
-        let url = format!("{}/bots/{}/check?userId={}", BASE_URL, self.bot_id, user_id);
-        let res = self.client
-            .get(&url)
-            .header("Authorization", &self.token)
-            .send()
-            .await
-            .unwrap()
+        let res = res
+            .unwrap()        
             .json::<CheckVote>()
-            .await
-            .unwrap();
+            .await;
+        if res.is_err() {
+            return None;
+        }
+        let res = res.unwrap();
 
         if res.voted == 0 {
-            return false;
+            return Some(false);
         } else {
-            return true;
+            return Some(true);
         }
+    }
+
+
+    /// A shortcut for getting the bot stats of the bot that created the client.
+    /// ## Examples
+    /// ```
+    /// let stats = client.my_bot_stats().await.unwrap();
+    /// ```
+    pub async fn my_bot_stats(&self) -> Option<BotStats> {
+        self.get_bot_stats(self.bot_id).await
     }
 
 
     /// Gets the 'stats' of the bot, this includes the server count, shard count, and shards (servers per shard).
     /// ## Examples
     /// ```
-    /// // Gets the stats for your own bot
-    /// client.get_bot_stats(None).await
-    /// // Gets the stats for another bot
-    /// client.get_bot_stats(Some(668701133069352961)).await
+    /// client.get_bot_stats(Some(668701133069352961)).await.unwrap();
     /// ```
-    pub async fn get_bot_stats(&self, bot_id: Option<u64>) -> BotStats {
-        let bot_id = bot_id.unwrap_or(self.bot_id);
+    pub async fn get_bot_stats(&self, bot_id: u64) -> Option<BotStats> {
         let url = format!("{}/bots/{}/stats", BASE_URL, bot_id);
         let res = self.client
             .get(&url)
             .header("Authorization", &self.token)
             .send()
-            .await
-            .unwrap()
-            .json::<BotStats>()
-            .await
-            .unwrap();
+            .await;
+        if res.is_err() {
+            return None;
+        }
 
-        res
+        let res = res
+            .unwrap()        
+            .json::<BotStats>()
+            .await;
+        if res.is_err() {
+            return None;
+        }
+        let res = res.unwrap();
+
+        Some(res)
     }
 
     
@@ -216,7 +284,7 @@ impl Topgg {
         }
 
         let url = format!("{}/bots/{}/stats", BASE_URL, self.bot_id);
-        let res = self.client
+        self.client
             .post(&url)
             .header("Authorization", &self.token)
             .json(&PostBotStats {
@@ -226,10 +294,7 @@ impl Topgg {
                 shard_count: shard_count,
             })
             .send()
-            .await
-            .unwrap();
-
-        println!("{:#?}", res)
+            .await;
     }
 }
 
