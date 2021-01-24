@@ -1,10 +1,7 @@
 # topgg-rs
-A top.gg library.
-
-
+A rust wrapper for the top.gg API.
 
 ## How to use
-In your `Cargo.toml`
 ```
 [dependencies]
 topgg-rs = "0.2.0"
