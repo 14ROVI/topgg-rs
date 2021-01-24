@@ -1,9 +1,7 @@
 # topgg-rs
-A top.gg library for rust that also abides by their rate limit.
-
+A rust wrapper for the top.gg API that also abides by their rate limit.
 
 ## How to use
-In your `Cargo.toml`
 ```
 [dependencies]
 topgg-rs = "0.2.0"
@@ -27,7 +25,7 @@ async fn main() {
     // gets the IDs of the people who have voted for any bot
     c.votes(another_bot_id).await.unrwap();
     
-    // checks if a user has voted for the bot you initalised wiht
+    // checks if a user has voted for the bot you initalised with
     c.voted_for_me(user_id).await.unwrap();
     // checks if a user has voted for the bot
     c.voted(another_bot_id, user_id).await.unwrap();
