@@ -1,11 +1,11 @@
 # topgg-rs
-A rust wrapper for the top.gg API that also abides by their rate limit and even has webhook support.
+A rust wrapper for the top.gg API that abides by their rate limit and even has webhook support.
 
 ## How to use
 In your `cargo.toml` please put
 ```
 [dependencies]
-topgg-rs = "0.2.0"
+topgg-rs = "0.3.0"
 ```
 
 ### Standard usage
