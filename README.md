@@ -1,12 +1,14 @@
 # topgg-rs
-A rust wrapper for the top.gg API that also abides by their rate limit.
+A rust wrapper for the top.gg API that also abides by their rate limit and even has webhook support.
 
 ## How to use
+In your `cargo.toml` please put
 ```
 [dependencies]
 topgg-rs = "0.2.0"
 ```
 
+### Standard usage
 ```rust
 #[tokio::main]
 async fn main() {
@@ -43,3 +45,17 @@ async fn main() {
 }
 ```
 
+### Webhook support
+If you want to use webhooks with this then here is an example
+```rust
+use futures::StreamExt;
+
+#[tokio::main]
+async fn main() {
+    let mut events = topgg::WebhookClient::start(3030, "a-very-secret-password".to_string());
+
+    while let Some(msg) = events.next().await {
+        println!("{:?}", msg)
+    }
+}
+```

@@ -3,6 +3,12 @@ use serde::{Deserialize, Serialize};
 use std::num::NonZeroU32;
 use governor::{Quota, RateLimiter, clock, state};
 
+use futures_util::future;
+use warp::Filter;
+use futures::channel::mpsc;
+use tokio::task;
+
+
 
 const BASE_URL: &str = "https://top.gg/api";
 
@@ -312,6 +318,80 @@ impl Topgg {
             .await
     }
 }
+
+
+
+pub struct WebhookClient;
+impl WebhookClient {
+    /// Starts listening to a port and filtering requests with a authentication string.
+    /// ## Examples
+    /// ```rust
+    /// use futures::StreamExt;
+    /// 
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let mut events = topgg::WebhookClient::start(3030, "a-very-secret-password".to_string());
+    ///     
+    ///     while let Some(msg) = events.next().await {
+    ///         println!("{:?}", msg)
+    ///     }
+    /// }
+    /// ```
+    pub fn start(port: u16, auth: String) -> mpsc::UnboundedReceiver<Webhook> {
+
+        let filter = warp::header::<String>("authorization")
+            .and_then(move |value| {
+                if value == auth {
+                    future::ok(())
+                } else {
+                    future::err(warp::reject::custom(Unauthorized))
+                }
+            })
+            .untuple_one();
+
+        let (event_send, event_read) = mpsc::unbounded();
+
+
+        let webhook = warp::post()
+            .and(filter)
+            .and(warp::body::json())
+            .map(move |hook: Webhook| {
+                event_send.unbounded_send(hook).unwrap();
+                warp::reply()
+            });
+        
+        task::spawn(async move {
+            warp::serve(webhook).run(([0, 0, 0, 0], port)).await;
+        });
+        
+        event_read
+    }
+}
+
+
+
+#[derive(Debug)]
+struct Unauthorized;
+impl warp::reject::Reject for Unauthorized {}
+impl std::fmt::Display for Unauthorized {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("Unauthorized")
+    }
+}
+impl std::error::Error for Unauthorized {}
+
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Webhook {
+    pub bot: String,
+    pub user: String,
+    #[serde(rename = "type")]
+    pub kind: String,
+    pub is_weekend: bool,
+    pub query: Option<String>,
+}
+
 
 
 
