@@ -12,7 +12,7 @@ topgg-rs = "0.3.0"
 ```rust
 #[tokio::main]
 async fn main() {
-    c = topgg::Topgg::new(bot_id, topgg_token);
+    let c = topgg::Topgg::new(bot_id, topgg_token);
     
     // gets the top.gg info about your bot
     c.my_bot().await.unwrap();
